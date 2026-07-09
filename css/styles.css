@@ -411,6 +411,7 @@ h1 span {
   display: flex;
   justify-content: space-between;
   gap: 24px;
+  min-width: 0;
   text-transform: uppercase;
 }
 
@@ -424,10 +425,15 @@ h1 span {
 }
 
 #footerStatus {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   transition: opacity 420ms ease, transform 420ms ease, filter 420ms ease;
 }
 
 #progressValue {
+  flex: 0 0 auto;
   color: var(--amber);
   font-size: clamp(26px, 3.2vw, 52px);
   font-weight: 300;
@@ -459,6 +465,17 @@ h1 span {
   margin-top: 12px;
   font-size: 11px;
   letter-spacing: 3px;
+}
+
+#fileStatus {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#fileCounter {
+  flex: 0 0 auto;
 }
 
 .console-log {
