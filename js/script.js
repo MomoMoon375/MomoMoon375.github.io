@@ -52,6 +52,7 @@ var serverName = document.getElementById("serverName");
 var mapName = document.getElementById("mapName");
 var gameMode = document.getElementById("gameMode");
 var backgroundMusic = document.getElementById("backgroundMusic");
+var loadingScreen = document.querySelector(".loading-screen");
 
 function addClass(element, className) {
   if (element.classList) {
@@ -87,9 +88,29 @@ function resolveAssetPath(path) {
   return link.href;
 }
 
+function setScreenBackground(path) {
+  if (!loadingScreen || !path) {
+    return;
+  }
+
+  var imagePath = resolveAssetPath(path);
+
+  loadingScreen.style.backgroundColor = "#050607";
+  loadingScreen.style.backgroundImage = "radial-gradient(circle at 78% 24%, rgba(154, 59, 45, 0.26), transparent 34%), radial-gradient(circle at 18% 80%, rgba(214, 150, 50, 0.15), transparent 34%), url('" + imagePath + "')";
+  loadingScreen.style.backgroundPosition = "center center, center center, center center";
+  loadingScreen.style.backgroundRepeat = "no-repeat, no-repeat, no-repeat";
+  loadingScreen.style.backgroundSize = "auto, auto, cover";
+}
+
 function createSlides() {
   var existingSlides = document.querySelectorAll(".slide");
   if (existingSlides.length) {
+    var images = getBackgroundImages();
+
+    if (images.length) {
+      setScreenBackground(images[0]);
+    }
+
     addConsoleLine("background / static slides " + existingSlides.length);
     window.setTimeout(function () {
       var loadedCount = 0;
@@ -143,13 +164,24 @@ function createSlides() {
 
 function cycleSlides() {
   var slides = document.querySelectorAll(".slide");
+  var images = getBackgroundImages();
+
   if (slides.length < 2) {
+    if (images.length) {
+      state.currentSlide = (state.currentSlide + 1) % images.length;
+      setScreenBackground(images[state.currentSlide]);
+    }
+
     return;
   }
 
   removeClass(slides[state.currentSlide], "is-active");
   state.currentSlide = (state.currentSlide + 1) % slides.length;
   addClass(slides[state.currentSlide], "is-active");
+
+  if (images.length) {
+    setScreenBackground(images[state.currentSlide % images.length]);
+  }
 }
 
 function swapText(element, value) {
