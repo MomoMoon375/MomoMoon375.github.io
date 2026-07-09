@@ -1,0 +1,252 @@
+var tips = [
+  "Дождись полной загрузки ресурсов — так карта, модели и звуки появятся без ошибок.",
+  "Если экран завис на скачивании, не закрывай игру сразу: крупные аддоны могут подключаться дольше.",
+  "Прочитай правила сервера перед началом игры — это экономит время тебе и администрации.",
+  "После входа дай клиенту несколько секунд на прогрузку окружения и интерфейса.",
+  "Для стабильной игры держи контент сервера установленным и не отключай нужные аддоны."
+];
+
+var fallbackStatuses = [
+  "Подключение к серверу...",
+  "Получение данных сессии...",
+  "Проверка контента...",
+  "Загрузка Workshop ресурсов...",
+  "Синхронизация клиента...",
+  "Подготовка к входу..."
+];
+
+var consoleMessages = [
+  "interval.auth / handshake accepted",
+  "imperial.assets / manifest received",
+  "reinz.core / route verified",
+  "workshop.stream / waiting for files",
+  "map.cache / rp_localinterval",
+  "client.sync / loading interface",
+  "audio.bus / music layer armed",
+  "session / awaiting final spawn"
+];
+
+var state = {
+  filesTotal: 0,
+  filesNeeded: 0,
+  simulatedProgress: 0,
+  currentSlide: 0,
+  statusIndex: 0,
+  tipIndex: 0,
+  hasRealProgress: false
+};
+
+var backgroundSlides = document.getElementById("backgroundSlides");
+var tipText = document.getElementById("tipText");
+var footerStatus = document.getElementById("footerStatus");
+var progressValue = document.getElementById("progressValue");
+var progressFill = document.getElementById("progressFill");
+var fileStatus = document.getElementById("fileStatus");
+var fileCounter = document.getElementById("fileCounter");
+var consoleTrack = document.getElementById("consoleTrack");
+var serverName = document.getElementById("serverName");
+var mapName = document.getElementById("mapName");
+var gameMode = document.getElementById("gameMode");
+var backgroundMusic = document.getElementById("backgroundMusic");
+
+function addClass(element, className) {
+  if (element.classList) {
+    element.classList.add(className);
+    return;
+  }
+
+  if ((" " + element.className + " ").indexOf(" " + className + " ") === -1) {
+    element.className += " " + className;
+  }
+}
+
+function removeClass(element, className) {
+  if (element.classList) {
+    element.classList.remove(className);
+    return;
+  }
+
+  element.className = (" " + element.className + " ").replace(" " + className + " ", " ");
+}
+
+function getBackgroundImages() {
+  if (window.l_bgImages && window.l_bgImages.length) {
+    return window.l_bgImages;
+  }
+
+  return [];
+}
+
+function createSlides() {
+  var images = getBackgroundImages();
+
+  for (var i = 0; i < images.length; i += 1) {
+    var slide = document.createElement("div");
+    slide.className = i === 0 ? "slide is-active" : "slide";
+    slide.style.backgroundImage = "url('" + images[i] + "')";
+    backgroundSlides.appendChild(slide);
+  }
+}
+
+function cycleSlides() {
+  var slides = document.querySelectorAll(".slide");
+  if (slides.length < 2) {
+    return;
+  }
+
+  removeClass(slides[state.currentSlide], "is-active");
+  state.currentSlide = (state.currentSlide + 1) % slides.length;
+  addClass(slides[state.currentSlide], "is-active");
+}
+
+function swapText(element, value) {
+  addClass(element, "is-changing");
+
+  window.setTimeout(function () {
+    element.textContent = value;
+    removeClass(element, "is-changing");
+  }, 220);
+}
+
+function addConsoleLine(message, variant) {
+  var line = document.createElement("div");
+  line.className = "log-line" + (variant ? " " + variant : "");
+  line.textContent = "[" + new Date().toLocaleTimeString("ru-RU") + "] " + message;
+  consoleTrack.insertBefore(line, consoleTrack.firstChild);
+
+  while (consoleTrack.children.length > 12) {
+    consoleTrack.removeChild(consoleTrack.lastElementChild);
+  }
+}
+
+function clampProgress(value) {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function renderProgress(value) {
+  var progress = clampProgress(value);
+  progressFill.style.width = progress + "%";
+  progressValue.textContent = progress + "%";
+}
+
+function renderFileCounter() {
+  var loaded = Math.max(0, state.filesTotal - state.filesNeeded);
+  fileCounter.textContent = loaded + " / " + state.filesTotal;
+}
+
+function updateProgressFromFiles() {
+  if (!state.filesTotal) {
+    return;
+  }
+
+  var loaded = state.filesTotal - state.filesNeeded;
+  renderProgress((loaded / state.filesTotal) * 100);
+  renderFileCounter();
+}
+
+function setStatus(message) {
+  if (!message) {
+    return;
+  }
+
+  swapText(footerStatus, message);
+  addConsoleLine(message);
+}
+
+function startMusic() {
+  if (!backgroundMusic) {
+    return;
+  }
+
+  backgroundMusic.volume = 0.34;
+
+  var playResult = backgroundMusic.play();
+  if (playResult && playResult.catch) {
+    playResult.catch(function () {
+      document.addEventListener("click", function playAfterClick() {
+        backgroundMusic.play();
+        document.removeEventListener("click", playAfterClick);
+      });
+    });
+  }
+}
+
+function startFallbackMotion() {
+  window.setInterval(cycleSlides, 5600);
+
+  window.setInterval(function () {
+    state.tipIndex = (state.tipIndex + 1) % tips.length;
+    swapText(tipText, tips[state.tipIndex]);
+  }, 6400);
+
+  window.setInterval(function () {
+    state.statusIndex = (state.statusIndex + 1) % fallbackStatuses.length;
+    if (!state.hasRealProgress) {
+      setStatus(fallbackStatuses[state.statusIndex]);
+    }
+  }, 3000);
+
+  window.setInterval(function () {
+    if (state.hasRealProgress) {
+      return;
+    }
+
+    state.simulatedProgress = Math.min(96, state.simulatedProgress + Math.random() * 4.8);
+    renderProgress(state.simulatedProgress);
+  }, 900);
+
+  window.setInterval(function () {
+    var message = consoleMessages[Math.floor(Math.random() * consoleMessages.length)];
+    addConsoleLine(message, Math.random() > 0.78 ? "warn" : "");
+  }, 1450);
+}
+
+window.GameDetails = function gameDetails(name, serverUrl, map, maxPlayers, steamId, mode) {
+  if (name) {
+    serverName.textContent = name;
+  }
+
+  mapName.textContent = map || "rp_localinterval";
+
+  if (mode) {
+    gameMode.textContent = mode;
+  }
+
+  addConsoleLine("session / " + (name || "server") + " " + (serverUrl || ""));
+  addConsoleLine("client / steam " + (steamId || "pending") + " maxplayers " + (maxPlayers || "?"));
+};
+
+window.SetStatusChanged = function setStatusChanged(status) {
+  state.hasRealProgress = true;
+  setStatus(status);
+};
+
+window.SetFilesTotal = function setFilesTotal(total) {
+  state.hasRealProgress = true;
+  state.filesTotal = Number(total) || 0;
+  state.filesNeeded = state.filesTotal;
+  renderFileCounter();
+  updateProgressFromFiles();
+};
+
+window.SetFilesNeeded = function setFilesNeeded(needed) {
+  state.hasRealProgress = true;
+  state.filesNeeded = Number(needed) || 0;
+  updateProgressFromFiles();
+};
+
+window.DownloadingFile = function downloadingFile(fileName) {
+  state.hasRealProgress = true;
+  fileStatus.textContent = fileName || "Загрузка файла";
+  addConsoleLine("download / " + (fileName || "resource"));
+};
+
+createSlides();
+startMusic();
+startFallbackMotion();
+renderProgress(0);
+renderFileCounter();
+
+for (var i = 0; i < 4; i += 1) {
+  addConsoleLine(consoleMessages[i]);
+}

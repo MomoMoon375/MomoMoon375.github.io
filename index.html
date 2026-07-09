@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#050607" />
+  <title>INTERVAL IMPERIAL CITY 77 — Loading Screen</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <audio id="backgroundMusic" src="songs/menu.mp3" preload="auto" autoplay loop></audio>
+
+  <main class="loading-screen">
+    <div class="background-slides" id="backgroundSlides" aria-hidden="true"></div>
+    <div class="screen-shade" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="scanline" aria-hidden="true"></div>
+
+    <img class="line-art line-art-top" src="images/lines7777.png" alt="" aria-hidden="true" />
+    <img class="line-art line-art-bottom" src="images/lines7777.png" alt="" aria-hidden="true" />
+
+    <section class="hero-panel" aria-label="Загрузка сервера INTERVAL IMPERIAL CITY 77">
+      <div class="top-code">GMOD // IMPERIAL PROTOCOL // REINZ</div>
+
+      <div class="brand-lockup">
+        <div class="emblem-frame">
+          <img src="images/logointerval.png" alt="INTERVAL IMPERIAL CITY 77" />
+        </div>
+
+        <div class="brand-copy">
+          <div class="eyebrow">Загрузка на сервер</div>
+          <h1>
+            <span>INTERVAL</span>
+            <span>IMPERIAL</span>
+          </h1>
+          <div class="subtitle">CITY 77</div>
+        </div>
+      </div>
+
+      <div class="divider-row" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <section class="tip-card">
+        <div class="tip-label">Совет</div>
+        <div class="tip-text" id="tipText">
+          Дождись полной загрузки ресурсов — так карта, модели и звуки появятся без ошибок.
+        </div>
+      </section>
+
+      <section class="server-grid">
+        <div>
+          <span>Сервер</span>
+          <strong id="serverName">Interval Imperial</strong>
+        </div>
+        <div>
+          <span>Карта</span>
+          <strong id="mapName">rp_localinterval</strong>
+        </div>
+        <div>
+          <span>Режим</span>
+          <strong id="gameMode">Garry's Mod</strong>
+        </div>
+      </section>
+    </section>
+
+    <section class="right-hud" aria-hidden="true">
+      <div class="hud-number">77</div>
+      <div class="hud-line"></div>
+      <div class="hud-stack">
+        <span>AUTH</span>
+        <span>DL</span>
+        <span>SYNC</span>
+      </div>
+    </section>
+
+    <section class="loading-footer" aria-label="Прогресс загрузки">
+      <div class="status-row">
+        <span id="footerStatus">Подключение к серверу...</span>
+        <span id="progressValue">0%</span>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <div class="download-row">
+        <span id="fileStatus">Ожидание списка файлов</span>
+        <span id="fileCounter">0 / 0</span>
+      </div>
+
+      <div class="console-log">
+        <div class="console-track" id="consoleTrack"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
