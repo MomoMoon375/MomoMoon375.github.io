@@ -54,7 +54,7 @@ body {
 }
 
 .background-slides {
-  z-index: -5;
+  z-index: 0;
   background: #050607;
 }
 
@@ -85,7 +85,7 @@ body {
 }
 
 .screen-shade {
-  z-index: -4;
+  z-index: 1;
   background:
     linear-gradient(90deg, rgba(3, 4, 5, 0.58) 0%, rgba(3, 4, 5, 0.34) 42%, rgba(3, 4, 5, 0.08) 74%, rgba(3, 4, 5, 0.42) 100%),
     linear-gradient(0deg, rgba(3, 4, 5, 0.54) 0%, transparent 36%, rgba(3, 4, 5, 0.34) 100%),

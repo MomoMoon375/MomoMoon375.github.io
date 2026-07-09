@@ -88,6 +88,24 @@ function resolveAssetPath(path) {
 }
 
 function createSlides() {
+  var existingSlides = document.querySelectorAll(".slide");
+  if (existingSlides.length) {
+    addConsoleLine("background / static slides " + existingSlides.length);
+    window.setTimeout(function () {
+      var loadedCount = 0;
+      var slideImages = document.querySelectorAll(".slide img");
+
+      for (var i = 0; i < slideImages.length; i += 1) {
+        if (slideImages[i].complete && slideImages[i].width > 0) {
+          loadedCount += 1;
+        }
+      }
+
+      addConsoleLine("background / visible " + loadedCount + " of " + slideImages.length);
+    }, 1400);
+    return;
+  }
+
   var images = getBackgroundImages();
 
   if (!images.length) {
