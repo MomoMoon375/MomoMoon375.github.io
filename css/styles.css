@@ -287,7 +287,7 @@ h1 span {
 }
 
 .tip-card {
-  width: min(430px, 100%);
+  width: min(640px, 100%);
   margin-top: 30px;
 }
 
@@ -301,11 +301,11 @@ h1 span {
 }
 
 .tip-text {
-  min-height: 76px;
+  min-height: 104px;
   color: rgba(234, 229, 216, 0.6);
-  font-size: 14px;
-  line-height: 1.75;
-  letter-spacing: 2px;
+  font-size: 13px;
+  line-height: 1.68;
+  letter-spacing: 1.6px;
   text-transform: uppercase;
   transition: opacity 420ms ease, transform 420ms ease, filter 420ms ease;
 }
@@ -395,7 +395,7 @@ h1 span {
   position: absolute;
   left: clamp(44px, 5.4vw, 86px);
   right: clamp(44px, 5.4vw, 86px);
-  bottom: clamp(32px, 5.2vh, 64px);
+  bottom: clamp(138px, 15.8vh, 176px);
   z-index: 6;
 }
 
