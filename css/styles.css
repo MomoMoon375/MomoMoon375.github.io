@@ -398,7 +398,7 @@ h1 span {
   position: absolute;
   left: clamp(44px, 5.4vw, 86px);
   right: clamp(44px, 5.4vw, 86px);
-  bottom: clamp(138px, 15.8vh, 176px);
+  bottom: clamp(98px, 11.2vh, 128px);
   z-index: 6;
 }
 
