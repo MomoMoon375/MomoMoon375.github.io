@@ -87,38 +87,6 @@ function resolveAssetPath(path) {
   return link.href;
 }
 
-function fitSlideImage(image) {
-  var viewportWidth = window.innerWidth || document.documentElement.clientWidth || 1920;
-  var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1080;
-  var imageWidth = image.naturalWidth || image.width || 16;
-  var imageHeight = image.naturalHeight || image.height || 9;
-  var viewportRatio = viewportWidth / viewportHeight;
-  var imageRatio = imageWidth / imageHeight;
-  var targetWidth;
-  var targetHeight;
-
-  if (imageRatio > viewportRatio) {
-    targetHeight = viewportHeight;
-    targetWidth = Math.ceil(targetHeight * imageRatio);
-  } else {
-    targetWidth = viewportWidth;
-    targetHeight = Math.ceil(targetWidth / imageRatio);
-  }
-
-  image.style.width = targetWidth + "px";
-  image.style.height = targetHeight + "px";
-  image.style.left = Math.floor((viewportWidth - targetWidth) / 2) + "px";
-  image.style.top = Math.floor((viewportHeight - targetHeight) / 2) + "px";
-}
-
-function fitAllSlideImages() {
-  var images = document.querySelectorAll(".slide img");
-
-  for (var i = 0; i < images.length; i += 1) {
-    fitSlideImage(images[i]);
-  }
-}
-
 function createSlides() {
   var images = getBackgroundImages();
 
@@ -139,7 +107,6 @@ function createSlides() {
 
     image.onload = (function (path) {
       return function () {
-        fitSlideImage(this);
         addConsoleLine("background / loaded " + path);
       };
     })(images[i]);
@@ -153,8 +120,6 @@ function createSlides() {
     slide.appendChild(image);
     backgroundSlides.appendChild(slide);
   }
-
-  fitAllSlideImages();
 }
 
 function cycleSlides() {
@@ -311,7 +276,6 @@ window.DownloadingFile = function downloadingFile(fileName) {
 };
 
 createSlides();
-window.onresize = fitAllSlideImages;
 startMusic();
 startFallbackMotion();
 renderProgress(0);
