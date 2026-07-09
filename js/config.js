@@ -7,7 +7,6 @@
   "backgrounds/images/Ogdvc9RYWMU.jpg",
   "backgrounds/images/s16Tzq67bZ8.jpg",
   "backgrounds/images/tu9cWC3Rm5M.jpg",
-  "backgrounds/images/VxukCmg-ulE.jpg",
   "backgrounds/images/yEgOAWAUHOs.jpg",
   "backgrounds/images/yZdTzAMpk6g.jpg"
 ];

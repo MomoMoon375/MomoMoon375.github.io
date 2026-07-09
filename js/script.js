@@ -101,6 +101,7 @@ function createSlides() {
     var imagePath = resolveAssetPath(images[i]);
 
     slide.className = i === 0 ? "slide is-active" : "slide";
+    slide.style.backgroundImage = "url('" + imagePath + "')";
     image.src = imagePath;
     image.alt = "";
     image.draggable = false;
