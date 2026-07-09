@@ -399,6 +399,7 @@ h1 span {
 }
 
 .loading-footer {
+  --progress-safe-zone: clamp(118px, 12vw, 180px);
   position: absolute;
   left: clamp(44px, 5.4vw, 86px);
   right: clamp(44px, 5.4vw, 86px);
@@ -480,9 +481,9 @@ h1 span {
 
 .console-log {
   position: absolute;
-  right: 0;
+  right: var(--progress-safe-zone);
   bottom: 54px;
-  width: min(520px, 44vw);
+  width: min(520px, calc(100% - var(--progress-safe-zone) - 18px));
   height: 172px;
   overflow: hidden;
   padding: 14px 18px;
@@ -496,6 +497,9 @@ h1 span {
 }
 
 .log-line {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: rgba(238, 229, 205, 0.45);
   white-space: nowrap;
 }
@@ -524,7 +528,7 @@ h1 span {
   }
 
   .console-log {
-    width: 420px;
+    width: min(420px, calc(100% - var(--progress-safe-zone) - 18px));
   }
 }
 
