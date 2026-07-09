@@ -59,17 +59,26 @@ body {
 }
 
 .slide {
-  background-position: center;
-  background-size: cover;
   opacity: 0;
   transform: scale(1.04);
-  filter: saturate(0.95) contrast(1.04) brightness(0.92);
   transition: opacity 1400ms ease, transform 6400ms ease;
 }
 
 .slide.is-active {
   opacity: 1;
   transform: scale(1.1);
+}
+
+.slide img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  filter: saturate(0.95) contrast(1.04) brightness(0.92);
 }
 
 .screen-shade {

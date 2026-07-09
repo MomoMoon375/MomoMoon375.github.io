@@ -77,13 +77,43 @@ function getBackgroundImages() {
   return [];
 }
 
+function resolveAssetPath(path) {
+  var link = document.createElement("a");
+  link.href = path;
+  return link.href;
+}
+
 function createSlides() {
   var images = getBackgroundImages();
 
+  if (!images.length) {
+    addConsoleLine("backgrounds / config is empty", "warn");
+    return;
+  }
+
   for (var i = 0; i < images.length; i += 1) {
     var slide = document.createElement("div");
+    var image = document.createElement("img");
+    var imagePath = resolveAssetPath(images[i]);
+
     slide.className = i === 0 ? "slide is-active" : "slide";
-    slide.style.backgroundImage = "url('" + images[i] + "')";
+    image.src = imagePath;
+    image.alt = "";
+    image.draggable = false;
+
+    image.onload = (function (path) {
+      return function () {
+        addConsoleLine("background / loaded " + path);
+      };
+    })(images[i]);
+
+    image.onerror = (function (path) {
+      return function () {
+        addConsoleLine("background / missing " + path, "warn");
+      };
+    })(images[i]);
+
+    slide.appendChild(image);
     backgroundSlides.appendChild(slide);
   }
 }
