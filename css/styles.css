@@ -44,17 +44,21 @@ button:focus-visible { outline: 2px solid var(--amber); outline-offset: 6px; }
   height: 100vh;
   padding: 0 var(--page-gutter);
   overflow: hidden;
-  isolation: isolate;
+  z-index: 0;
   background: var(--bg) url("../backgrounds/images/3GAo6YAWWBo.jpg") center / cover no-repeat;
 }
 
 .background-slides, .slide, .screen-shade, .grain {
   position: absolute;
-  inset: 0;
+  /* GMod's CEF 86 does not support the inset shorthand. */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   pointer-events: none;
 }
 
-.background-slides { z-index: -3; }
+.background-slides { z-index: 0; }
 
 .slide {
   overflow: hidden;
@@ -76,16 +80,22 @@ button:focus-visible { outline: 2px solid var(--amber); outline-offset: 6px; }
 }
 
 .screen-shade {
-  z-index: -2;
+  z-index: 1;
+  background: rgba(5, 7, 7, 0.72);
   background:
     linear-gradient(90deg, rgba(5, 7, 7, 0.86), rgba(5, 7, 7, 0.64) 42%, rgba(5, 7, 7, 0.28) 72%, rgba(5, 7, 7, 0.5)),
     linear-gradient(0deg, rgba(5, 7, 7, 0.96), rgba(5, 7, 7, 0.14) 52%, rgba(5, 7, 7, 0.53));
 }
 
 .grain {
-  z-index: -1;
+  z-index: 2;
   opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23n)' opacity='.8' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
+}
+
+.screen-header, .screen-content, .screen-footer {
+  position: relative;
+  z-index: 3;
 }
 
 .screen-header {
@@ -165,7 +175,10 @@ h1 {
 .title-letter::before {
   content: attr(data-letter);
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   color: var(--amber-hot);
   -webkit-text-stroke: 0;
   clip-path: inset(var(--letter-cutoff, 100%) 0 0 0);
