@@ -3,126 +3,132 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#050607" />
-  <title>INTERVAL IMPERIAL CITY 77 — Loading Screen</title>
+  <meta name="theme-color" content="#080909" />
+  <title>INTERVAL IMPERIAL CITY 77 — Подключение</title>
+  <link rel="icon" href="images/logointerval.original.png" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
   <audio id="backgroundMusic" src="songs/menu.mp3" preload="auto" autoplay loop></audio>
 
   <main class="loading-screen">
-    <div class="background-slides" id="backgroundSlides" aria-hidden="true">
-      <div class="slide is-active" style="background-image: url('backgrounds/images/3GAo6YAWWBo.jpg')">
-        <img src="backgrounds/images/3GAo6YAWWBo.jpg" alt="" />
-      </div>
-      <div class="slide" style="background-image: url('backgrounds/images/bmJAqRzSP0g.jpg')">
-        <img src="backgrounds/images/bmJAqRzSP0g.jpg" alt="" />
-      </div>
-      <div class="slide" style="background-image: url('backgrounds/images/BrmhoMI-Ei0.jpg')">
-        <img src="backgrounds/images/BrmhoMI-Ei0.jpg" alt="" />
-      </div>
-      <div class="slide" style="background-image: url('backgrounds/images/fOdi79WyxhQ.jpg')">
-        <img src="backgrounds/images/fOdi79WyxhQ.jpg" alt="" />
-      </div>
-      <div class="slide" style="background-image: url('backgrounds/images/gC7D0bQO734.jpg')">
-        <img src="backgrounds/images/gC7D0bQO734.jpg" alt="" />
-      </div>
-      <div class="slide" style="background-image: url('backgrounds/images/Ogdvc9RYWMU.jpg')">
-        <img src="backgrounds/images/Ogdvc9RYWMU.jpg" alt="" />
-      </div>
-      <div class="slide" style="background-image: url('backgrounds/images/s16Tzq67bZ8.jpg')">
-        <img src="backgrounds/images/s16Tzq67bZ8.jpg" alt="" />
-      </div>
-      <div class="slide" style="background-image: url('backgrounds/images/tu9cWC3Rm5M.jpg')">
-        <img src="backgrounds/images/tu9cWC3Rm5M.jpg" alt="" />
-      </div>
-      <div class="slide" style="background-image: url('backgrounds/images/yEgOAWAUHOs.jpg')">
-        <img src="backgrounds/images/yEgOAWAUHOs.jpg" alt="" />
-      </div>
-      <div class="slide" style="background-image: url('backgrounds/images/yZdTzAMpk6g.jpg')">
-        <img src="backgrounds/images/yZdTzAMpk6g.jpg" alt="" />
-      </div>
-    </div>
+    <div class="background-slides" id="backgroundSlides" aria-hidden="true"></div>
     <div class="screen-shade" aria-hidden="true"></div>
     <div class="grain" aria-hidden="true"></div>
-    <div class="scanline" aria-hidden="true"></div>
 
-    <section class="hero-panel" aria-label="Загрузка сервера INTERVAL IMPERIAL CITY 77">
-      <div class="top-code">GMOD // IMPERIAL PROTOCOL // REINZ</div>
+    <header class="screen-header">
+      <div class="header-brand" aria-label="Interval Imperial">
+        <img class="brand-emblem" src="images/logointerval.original.png" alt="" />
+        <span>INTERVAL <span class="brand-slash">/</span> IMPERIAL</span>
+      </div>
 
-      <div class="brand-lockup">
-        <div class="emblem-frame">
-          <img src="images/logointerval.original.png" alt="INTERVAL IMPERIAL CITY 77" />
-        </div>
+      <div class="server-badges" aria-label="Информация о подключении">
+        <span class="status-badge city-badge"><span class="status-dot" aria-hidden="true"></span> CITY 77</span>
+        <span class="status-badge map-badge"><span class="badge-label">Карта</span> <span id="mapName">rp_localinterval</span></span>
+        <span class="status-badge"><span class="badge-label">Мест</span> <span id="maxPlayers">—</span></span>
+      </div>
+    </header>
 
-        <div class="brand-copy">
-          <div class="eyebrow">Загрузка на сервер</div>
-          <h1>
-            <span>INTERVAL</span>
-            <span>IMPERIAL</span>
+    <div class="screen-content">
+      <section class="hero-panel" aria-label="Загрузка сервера Interval Imperial City 77">
+        <div class="hero-intro">
+          <p class="eyebrow">Garry’s Mod <span>·</span> Imperial Network</p>
+          <h1 class="project-title" id="projectTitle" aria-label="INTERVAL">
+            <span class="title-letter" data-letter="I" aria-hidden="true">I</span>
+            <span class="title-letter" data-letter="N" aria-hidden="true">N</span>
+            <span class="title-letter" data-letter="T" aria-hidden="true">T</span>
+            <span class="title-letter" data-letter="E" aria-hidden="true">E</span>
+            <span class="title-letter" data-letter="R" aria-hidden="true">R</span>
+            <span class="title-letter" data-letter="V" aria-hidden="true">V</span>
+            <span class="title-letter" data-letter="A" aria-hidden="true">A</span>
+            <span class="title-letter" data-letter="L" aria-hidden="true">L</span>
           </h1>
-          <div class="subtitle">CITY 77</div>
-        </div>
-      </div>
+          <div class="title-caption" aria-label="Imperial City 77">
+            <span>IMPERIAL CITY</span>
+            <span class="caption-line" aria-hidden="true"></span>
+            <span class="city-number">77</span>
+          </div>
 
-      <div class="divider-row" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
+          <p class="hero-description">Город под контролем Союза. Дефицит ресурсов, постоянное наблюдение и борьба за выживание. Ваша история в Сити 77 начинается здесь.</p>
 
-      <section class="tip-card">
-        <div class="tip-label">Совет</div>
-        <div class="tip-text" id="tipText">
-          Каждый звук может стоить вам жизни. В тишине можно услышать всё: шаги врагов, шорохи зомби. Двигайтесь бесшумно и не оставляйте следов.
+          <section class="connection-panel" aria-label="Прогресс загрузки">
+            <div class="status-row">
+              <div class="loading-status">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span id="footerStatus" role="status">Подключение к серверу...</span>
+              </div>
+              <span id="progressValue">0%</span>
+            </div>
+
+            <div class="progress-track" id="progressTrack" role="progressbar" aria-label="Загрузка ресурсов" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="download-row">
+              <span class="download-file"><span class="file-prompt" aria-hidden="true">&gt;</span><span id="fileStatus">Ожидание списка файлов</span></span>
+              <span id="fileCounter">0 / 0</span>
+            </div>
+          </section>
         </div>
+
+        <section class="tip-card" aria-labelledby="tipHeading">
+          <div class="tip-heading">
+            <h2 id="tipHeading">Совет по выживанию</h2>
+            <span id="tipCounter" aria-hidden="true">01 / 09</span>
+          </div>
+          <p class="tip-text" id="tipText">Каждый звук может стоить вам жизни. В тишине можно услышать всё: шаги врагов, шорохи зомби. Двигайтесь бесшумно и не оставляйте следов.</p>
+        </section>
       </section>
 
-      <section class="server-grid">
-        <div>
-          <span>Сервер</span>
-          <strong id="serverName">Interval Imperial</strong>
-        </div>
-        <div>
-          <span>Карта</span>
-          <strong id="mapName">rp_localinterval</strong>
-        </div>
-        <div>
-          <span>Режим</span>
-          <strong id="gameMode">Garry's Mod</strong>
-        </div>
-      </section>
-    </section>
+      <aside class="side-panel" aria-label="Информация о мире и сервере">
+        <section class="info-card briefing-card" aria-labelledby="briefingHeading">
+          <div class="card-heading">
+            <h2 id="briefingHeading">Сводка города</h2>
+            <svg class="sector-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/><path d="M9 12h6M12 9v6"/></svg>
+          </div>
 
-    <section class="right-hud" aria-hidden="true">
-      <div class="hud-number">77</div>
-      <div class="hud-line"></div>
-      <div class="hud-stack">
-        <span>AUTH</span>
-        <span>DL</span>
-        <span>SYNC</span>
-      </div>
-    </section>
+          <article class="briefing-item">
+            <p class="item-label">01 / Наблюдение</p>
+            <h3>Союз видит всё</h3>
+            <p>Машины следят за каждым шагом. Используйте окружение, чтобы остаться незамеченным.</p>
+          </article>
+          <article class="briefing-item">
+            <p class="item-label">02 / Выживание</p>
+            <h3>Каждый ресурс на счету</h3>
+            <p>Еда, вода и патроны — теперь роскошь. Берегите то, что помогает вам жить.</p>
+          </article>
+          <article class="briefing-item">
+            <p class="item-label">03 / Осторожность</p>
+            <h3>Тишина — ваш союзник</h3>
+            <p>Прислушивайтесь к городу. Иногда вовремя услышанный шаг решает всё.</p>
+          </article>
+        </section>
 
-    <section class="loading-footer" aria-label="Прогресс загрузки">
-      <div class="status-row">
-        <span id="footerStatus">Подключение к серверу...</span>
-        <span id="progressValue">0%</span>
-      </div>
+        <section class="info-card server-card" aria-labelledby="serverHeading">
+          <img class="server-watermark" src="images/logointerval.original.png" alt="" aria-hidden="true" />
+          <div class="card-heading">
+            <h2 id="serverHeading">Сервер</h2>
+            <span class="server-code">I / 77</span>
+          </div>
+          <dl class="server-details">
+            <div><dt>Название</dt><dd id="serverName">Interval Imperial</dd></div>
+            <div><dt>Режим</dt><dd id="gameMode">Garry’s Mod</dd></div>
+            <div><dt>Карта</dt><dd id="serverMapName">rp_localinterval</dd></div>
+          </dl>
+          <div class="server-note"><span aria-hidden="true"></span> Imperial protocol / Reinz</div>
+        </section>
+      </aside>
+    </div>
 
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-
-      <div class="download-row">
-        <span id="fileStatus">Ожидание списка файлов</span>
-        <span id="fileCounter">0 / 0</span>
-      </div>
-
-      <div class="console-log">
-        <div class="console-track" id="consoleTrack"></div>
-      </div>
-    </section>
+    <footer class="screen-footer">
+      <span class="footer-signature">INTERVAL IMPERIAL <span>/</span> CITY 77</span>
+      <span class="footer-message">По ту сторону привычного мира</span>
+      <button class="music-toggle" id="musicToggle" type="button" aria-label="Включить музыку" aria-pressed="false">
+        <span class="equalizer" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span id="musicLabel">Включить музыку</span>
+      </button>
+    </footer>
+    <div id="consoleTrack" hidden aria-hidden="true"></div>
   </main>
 
   <script src="js/config.js"></script>

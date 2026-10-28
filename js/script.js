@@ -45,13 +45,25 @@ var tipText = document.getElementById("tipText");
 var footerStatus = document.getElementById("footerStatus");
 var progressValue = document.getElementById("progressValue");
 var progressFill = document.getElementById("progressFill");
+var progressTrack = document.getElementById("progressTrack");
+var projectTitle = document.getElementById("projectTitle");
+var titleLetters = document.querySelectorAll(".title-letter");
+var titleProgress = 0;
+var titleAnimationFrame = 0;
+var titleInkTop = 0;
+var titleInkBottom = 0;
 var fileStatus = document.getElementById("fileStatus");
 var fileCounter = document.getElementById("fileCounter");
 var consoleTrack = document.getElementById("consoleTrack");
 var serverName = document.getElementById("serverName");
 var mapName = document.getElementById("mapName");
+var serverMapName = document.getElementById("serverMapName");
+var maxPlayersLabel = document.getElementById("maxPlayers");
+var tipCounter = document.getElementById("tipCounter");
 var gameMode = document.getElementById("gameMode");
 var backgroundMusic = document.getElementById("backgroundMusic");
+var musicToggle = document.getElementById("musicToggle");
+var musicLabel = document.getElementById("musicLabel");
 var loadingScreen = document.querySelector(".loading-screen");
 
 function addClass(element, className) {
@@ -185,9 +197,10 @@ function cycleSlides() {
 }
 
 function swapText(element, value) {
+  window.clearTimeout(element.textSwapTimer);
   addClass(element, "is-changing");
 
-  window.setTimeout(function () {
+  element.textSwapTimer = window.setTimeout(function () {
     element.textContent = value;
     removeClass(element, "is-changing");
   }, 220);
@@ -208,10 +221,92 @@ function clampProgress(value) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
+function renderTitleProgress(value) {
+  var filledLetters = (value / 100) * titleLetters.length;
+
+  for (var i = 0; i < titleLetters.length; i += 1) {
+    var letter = titleLetters[i];
+    var fill = Math.max(0, Math.min(1, filledLetters - i));
+    var cutoff = titleInkBottom - fill * (titleInkBottom - titleInkTop);
+
+    letter.style.setProperty("--letter-cutoff", fill === 0 ? "100%" : fill === 1 ? "0px" : cutoff + "px");
+
+    if (fill === 1) {
+      addClass(letter, "is-complete");
+    } else {
+      removeClass(letter, "is-complete");
+    }
+
+    if (fill > 0 && fill < 1) {
+      addClass(letter, "is-active");
+    } else {
+      removeClass(letter, "is-active");
+    }
+  }
+}
+
+function measureTitleInk() {
+  var style = window.getComputedStyle(projectTitle);
+  var fontSize = parseFloat(style.fontSize);
+  var lineHeight = parseFloat(style.lineHeight) || fontSize * 1.15;
+  var context = document.createElement("canvas").getContext("2d");
+  context.font = style.fontWeight + " " + style.fontSize + " " + style.fontFamily;
+  var metrics = context.measureText("INTERVAL");
+
+  // Use the visible glyph bounds so filling starts at the foot of each letter.
+  if (typeof metrics.fontBoundingBoxAscent === "number" && typeof metrics.actualBoundingBoxAscent === "number") {
+    var baseline = (lineHeight - metrics.fontBoundingBoxAscent - metrics.fontBoundingBoxDescent) / 2 + metrics.fontBoundingBoxAscent;
+    titleInkTop = baseline - metrics.actualBoundingBoxAscent;
+    titleInkBottom = baseline + metrics.actualBoundingBoxDescent;
+  } else {
+    titleInkTop = fontSize * 0.25;
+    titleInkBottom = fontSize * 1.02;
+  }
+
+  renderTitleProgress(titleProgress);
+}
+
+function animateTitleProgress(target) {
+  window.cancelAnimationFrame(titleAnimationFrame);
+
+  if (target === titleProgress || (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) {
+    titleProgress = target;
+    renderTitleProgress(target);
+    return;
+  }
+
+  var initial = titleProgress;
+  var startedAt = null;
+
+  // Animate one shared value so large updates still fill the letters in order.
+  function tick(timestamp) {
+    if (startedAt === null) {
+      startedAt = timestamp;
+    }
+
+    var elapsed = Math.min(1, (timestamp - startedAt) / 600);
+    var eased = 1 - Math.pow(1 - elapsed, 3);
+    titleProgress = initial + (target - initial) * eased;
+    renderTitleProgress(titleProgress);
+
+    if (elapsed < 1) {
+      titleAnimationFrame = window.requestAnimationFrame(tick);
+    }
+  }
+
+  titleAnimationFrame = window.requestAnimationFrame(tick);
+}
+
 function renderProgress(value) {
   var progress = clampProgress(value);
   progressFill.style.width = progress + "%";
   progressValue.textContent = progress + "%";
+  progressTrack.setAttribute("aria-valuenow", progress);
+  animateTitleProgress(progress);
+}
+
+function renderTipCounter() {
+  tipCounter.textContent = ("0" + (state.tipIndex + 1)).slice(-2) + " / " + ("0" + tips.length).slice(-2);
 }
 
 function renderFileCounter() {
@@ -238,31 +333,54 @@ function setStatus(message) {
   addConsoleLine(message);
 }
 
+function playMusic() {
+  var playResult = backgroundMusic.play();
+  if (playResult && playResult.catch) {
+    playResult.catch(updateMusicControl);
+  }
+}
+
+function updateMusicControl() {
+  var playing = !backgroundMusic.paused;
+  musicToggle.setAttribute("aria-pressed", playing ? "true" : "false");
+  musicToggle.setAttribute("aria-label", playing ? "Выключить музыку" : "Включить музыку");
+  musicLabel.textContent = playing ? "Музыка включена" : "Включить музыку";
+
+  if (playing) {
+    addClass(musicToggle, "is-playing");
+  } else {
+    removeClass(musicToggle, "is-playing");
+  }
+}
+
 function startMusic() {
   if (!backgroundMusic) {
     return;
   }
 
   backgroundMusic.volume = 0.34;
+  backgroundMusic.addEventListener("play", updateMusicControl);
+  backgroundMusic.addEventListener("pause", updateMusicControl);
+  musicToggle.addEventListener("click", function () {
+    if (backgroundMusic.paused) {
+      playMusic();
+    } else {
+      backgroundMusic.pause();
+    }
+  });
 
-  var playResult = backgroundMusic.play();
-  if (playResult && playResult.catch) {
-    playResult.catch(function () {
-      document.addEventListener("click", function playAfterClick() {
-        backgroundMusic.play();
-        document.removeEventListener("click", playAfterClick);
-      });
-    });
-  }
+  playMusic();
+  updateMusicControl();
 }
 
 function startFallbackMotion() {
-  window.setInterval(cycleSlides, 5600);
+  window.setInterval(cycleSlides, 14000);
 
   window.setInterval(function () {
     state.tipIndex = (state.tipIndex + 1) % tips.length;
     swapText(tipText, tips[state.tipIndex]);
-  }, 6400);
+    renderTipCounter();
+  }, 12000);
 
   window.setInterval(function () {
     state.statusIndex = (state.statusIndex + 1) % fallbackStatuses.length;
@@ -292,6 +410,8 @@ window.GameDetails = function gameDetails(name, serverUrl, map, maxPlayers, stea
   }
 
   mapName.textContent = map || "rp_localinterval";
+  serverMapName.textContent = mapName.textContent;
+  maxPlayersLabel.textContent = Number(maxPlayers) > 0 ? maxPlayers : "—";
 
   if (mode) {
     gameMode.textContent = mode;
@@ -326,11 +446,18 @@ window.DownloadingFile = function downloadingFile(fileName) {
   addConsoleLine("download / " + (fileName || "resource"));
 };
 
+measureTitleInk();
+window.addEventListener("resize", measureTitleInk);
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(measureTitleInk);
+}
+
 createSlides();
 startMusic();
 startFallbackMotion();
 renderProgress(0);
 renderFileCounter();
+renderTipCounter();
 
 for (var i = 0; i < 4; i += 1) {
   addConsoleLine(consoleMessages[i]);
