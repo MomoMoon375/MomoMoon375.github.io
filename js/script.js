@@ -33,6 +33,11 @@ var consoleMessages = [
 var state = {
   filesTotal: 0,
   filesNeeded: 0,
+  hasFilesNeeded: false,
+  hasFileProgress: false,
+  currentDownload: "",
+  progress: 0,
+  loadingComplete: false,
   simulatedProgress: 0,
   currentSlide: 0,
   statusIndex: 0,
@@ -49,7 +54,9 @@ var progressTrack = document.getElementById("progressTrack");
 var projectTitle = document.getElementById("projectTitle");
 var titleLetters = document.querySelectorAll(".title-letter");
 var titleProgress = 0;
+var titleTargetProgress = 0;
 var titleAnimationFrame = 0;
+var titleAnimationTimeout = 0;
 var titleInkTop = 0;
 var titleInkBottom = 0;
 var fileStatus = document.getElementById("fileStatus");
@@ -218,7 +225,8 @@ function addConsoleLine(message, variant) {
 }
 
 function clampProgress(value) {
-  return Math.max(0, Math.min(100, Math.round(value)));
+  var number = Number(value);
+  return isFinite(number) ? Math.max(0, Math.min(100, Math.round(number))) : state.progress;
 }
 
 function renderTitleProgress(value) {
@@ -266,39 +274,64 @@ function measureTitleInk() {
   renderTitleProgress(titleProgress);
 }
 
-function animateTitleProgress(target) {
-  window.cancelAnimationFrame(titleAnimationFrame);
+function finishTitleAnimation() {
+  if (window.cancelAnimationFrame) {
+    window.cancelAnimationFrame(titleAnimationFrame);
+  }
+  window.clearTimeout(titleAnimationTimeout);
+  titleAnimationFrame = 0;
+  titleProgress = titleTargetProgress;
+  renderTitleProgress(titleProgress);
+}
 
-  if (target === titleProgress || (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) {
-    titleProgress = target;
-    renderTitleProgress(target);
+function animateTitleProgress(target) {
+  if (target === titleTargetProgress && (titleAnimationFrame || target === titleProgress)) {
     return;
   }
 
-  var initial = titleProgress;
-  var startedAt = null;
+  titleTargetProgress = target;
 
-  // Animate one shared value so large updates still fill the letters in order.
-  function tick(timestamp) {
-    if (startedAt === null) {
-      startedAt = timestamp;
+  // Commit completion immediately, even when animation frames are paused.
+  if (target === 100 || target === titleProgress || !window.requestAnimationFrame ||
+      (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) {
+    finishTitleAnimation();
+    return;
+  }
+
+  // Also finish if the embedded browser pauses requestAnimationFrame during loading.
+  window.clearTimeout(titleAnimationTimeout);
+  titleAnimationTimeout = window.setTimeout(finishTitleAnimation, 800);
+
+  // Keep the running animation alive when many file events arrive between frames.
+  if (titleAnimationFrame) {
+    return;
+  }
+
+  var lastTick = Date.now();
+
+  function tick() {
+    var now = Date.now();
+    var elapsed = Math.max(0, now - lastTick);
+    lastTick = now;
+    titleProgress += (titleTargetProgress - titleProgress) * (1 - Math.exp(-elapsed / 120));
+
+    if (Math.abs(titleTargetProgress - titleProgress) < 0.05) {
+      finishTitleAnimation();
+      return;
     }
 
-    var elapsed = Math.min(1, (timestamp - startedAt) / 600);
-    var eased = 1 - Math.pow(1 - elapsed, 3);
-    titleProgress = initial + (target - initial) * eased;
     renderTitleProgress(titleProgress);
-
-    if (elapsed < 1) {
-      titleAnimationFrame = window.requestAnimationFrame(tick);
-    }
+    titleAnimationFrame = window.requestAnimationFrame(tick);
   }
 
   titleAnimationFrame = window.requestAnimationFrame(tick);
 }
 
 function renderProgress(value) {
-  var progress = clampProgress(value);
+  // File lists can be refreshed or delivered out of order within one connection.
+  var progress = Math.max(state.progress, clampProgress(value));
+  state.progress = progress;
+  state.simulatedProgress = Math.max(state.simulatedProgress, progress);
   progressFill.style.width = progress + "%";
   progressValue.textContent = progress + "%";
   progressTrack.setAttribute("aria-valuenow", progress);
@@ -310,18 +343,51 @@ function renderTipCounter() {
 }
 
 function renderFileCounter() {
-  var loaded = Math.max(0, state.filesTotal - state.filesNeeded);
+  var loaded = Math.max(0, Math.min(state.filesTotal, state.filesTotal - state.filesNeeded));
   fileCounter.textContent = loaded + " / " + state.filesTotal;
 }
 
 function updateProgressFromFiles() {
-  if (!state.filesTotal) {
+  if (!state.filesTotal || !state.hasFilesNeeded || state.loadingComplete) {
     return;
   }
 
+  state.hasFileProgress = true;
   var loaded = state.filesTotal - state.filesNeeded;
   renderProgress((loaded / state.filesTotal) * 100);
   renderFileCounter();
+}
+
+function readFileCount(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  var count = Number(value);
+  return isFinite(count) && count >= 0 ? Math.floor(count) : null;
+}
+
+function finishCurrentDownload() {
+  if (!state.currentDownload) {
+    return;
+  }
+
+  state.currentDownload = "";
+
+  // GMod reports the start of each file, but may not refresh the remaining count.
+  if (state.hasFileProgress && !state.loadingComplete) {
+    state.filesNeeded = Math.max(0, state.filesNeeded - 1);
+    updateProgressFromFiles();
+  }
+}
+
+function finishLoading() {
+  state.loadingComplete = true;
+  state.currentDownload = "";
+  state.filesNeeded = 0;
+  fileStatus.textContent = "Ресурсы загружены";
+  renderFileCounter();
+  renderProgress(100);
 }
 
 function setStatus(message) {
@@ -390,11 +456,11 @@ function startFallbackMotion() {
   }, 3000);
 
   window.setInterval(function () {
-    if (state.hasRealProgress) {
+    if (state.hasFileProgress || state.loadingComplete) {
       return;
     }
 
-    state.simulatedProgress = Math.min(96, state.simulatedProgress + Math.random() * 4.8);
+    state.simulatedProgress = Math.min(90, state.simulatedProgress + Math.random() * 4.8);
     renderProgress(state.simulatedProgress);
   }, 900);
 
@@ -422,26 +488,68 @@ window.GameDetails = function gameDetails(name, serverUrl, map, maxPlayers, stea
 };
 
 window.SetStatusChanged = function setStatusChanged(status) {
+  if (!status) {
+    return;
+  }
+
   state.hasRealProgress = true;
   setStatus(status);
+
+  if (/(error|fail|cancel|disconnect|timed?\s*out|ошиб|отмен|отключ)/i.test(status)) {
+    state.currentDownload = "";
+  } else if (/(starting\s+lua|lua\s+(started|initialized)|sending\s+client\s+info|запуск\s+lua|lua\s+запущен|отправка\s+(данных|информации)\s+клиент)/i.test(status)) {
+    finishLoading();
+  } else {
+    finishCurrentDownload();
+  }
 };
 
 window.SetFilesTotal = function setFilesTotal(total) {
+  var count = readFileCount(total);
+  if (count === null || state.loadingComplete) {
+    return;
+  }
+
   state.hasRealProgress = true;
-  state.filesTotal = Number(total) || 0;
-  state.filesNeeded = state.filesTotal;
+  state.filesTotal = count;
+  // RefreshDownloadables sends SetFilesNeeded BEFORE SetFilesTotal.
+  if (!state.hasFilesNeeded) {
+    state.filesNeeded = state.filesTotal;
+  }
   renderFileCounter();
   updateProgressFromFiles();
 };
 
 window.SetFilesNeeded = function setFilesNeeded(needed) {
+  var count = readFileCount(needed);
+  if (count === null || state.loadingComplete) {
+    return;
+  }
+
   state.hasRealProgress = true;
-  state.filesNeeded = Number(needed) || 0;
+  // An authoritative decrease already accounts for the previous file finishing.
+  if (state.hasFilesNeeded && count < state.filesNeeded) {
+    state.currentDownload = "";
+  }
+  state.hasFilesNeeded = true;
+  state.filesNeeded = count;
+  if (count === 0) {
+    state.currentDownload = "";
+  }
+  renderFileCounter();
   updateProgressFromFiles();
 };
 
 window.DownloadingFile = function downloadingFile(fileName) {
+  if (state.loadingComplete) {
+    return;
+  }
+
   state.hasRealProgress = true;
+  if (fileName && fileName !== state.currentDownload) {
+    finishCurrentDownload();
+    state.currentDownload = fileName;
+  }
   fileStatus.textContent = fileName || "Загрузка файла";
   addConsoleLine("download / " + (fileName || "resource"));
 };
